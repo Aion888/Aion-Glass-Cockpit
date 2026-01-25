@@ -1,0 +1,127 @@
+from dash import Dash, html, dcc
+import os, time
+
+app = Dash(__name__)
+app.title = "Project Aion — Glass Cockpit (Framework Only)"
+server = app.server
+
+def build_stamp():
+    try:
+        mtime = os.path.getmtime(__file__)
+        stamp = f"{os.path.basename(__file__)} • {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))}"
+    except Exception:
+        stamp = "unknown"
+    return html.Div(
+        f"BUILD: {stamp}",
+        style={
+            "position":"fixed","bottom":"8px","right":"10px","zIndex":9999,
+            "fontFamily":"Arial","fontSize":"11px","opacity":0.75,
+            "background":"rgba(255,255,255,0.92)","padding":"4px 10px",
+            "borderRadius":"999px","border":"1px solid #d7dbe0",
+            "boxShadow":"0 4px 16px rgba(0,0,0,0.08)",
+        },
+    )
+
+def card(title, value, note=""):
+    return html.Div(
+        [
+            html.Div(title, style={"fontSize":"12px","opacity":0.7}),
+            html.Div(value, style={"fontSize":"28px","fontWeight":"900","marginTop":"6px"}),
+            html.Div(note, style={"fontSize":"12px","opacity":0.7,"marginTop":"8px"}) if note else None,
+        ],
+        style={
+            "border":"1px solid #e1e5ea",
+            "borderRadius":"18px",
+            "padding":"14px",
+            "boxShadow":"0 6px 22px rgba(0,0,0,0.08)",
+            "background":"white",
+            "minHeight":"120px",
+        },
+    )
+
+def panel(title, children):
+    return html.Div(
+        [html.Div(title, style={"fontWeight":"900","marginBottom":"10px"}), children],
+        style={
+            "border":"1px solid #e1e5ea",
+            "borderRadius":"18px",
+            "padding":"14px",
+            "boxShadow":"0 6px 22px rgba(0,0,0,0.08)",
+            "background":"white",
+        },
+    )
+
+app.layout = html.Div(
+    style={"fontFamily":"Arial","background":"#f6f7f9","minHeight":"100vh"},
+    children=[
+        html.Div(
+            style={
+                "position":"sticky","top":"0","zIndex":"5",
+                "background":"rgba(246,247,249,0.92)",
+                "backdropFilter":"blur(10px)",
+                "borderBottom":"1px solid #e3e5e8",
+                "padding":"14px 18px",
+                "display":"flex","alignItems":"center","justifyContent":"space-between",
+            },
+            children=[
+                html.Div([html.Div("Project Aion", style={"fontSize":"12px","opacity":0.7}),
+                          html.Div("Glass Cockpit — GUI Framework", style={"fontSize":"20px","fontWeight":"900"})]),
+                html.Div([dcc.Link("Open PM System (:8050)", href="http://127.0.0.1:8050/", style={"marginRight":"14px"}),
+                          html.Span("FRAMEWORK ONLY — NO DATA", style={"fontSize":"12px","opacity":0.75})]),
+            ],
+        ),
+
+        html.Div(
+            style={"display":"grid","gridTemplateColumns":"260px 1fr","gap":"12px","padding":"12px 18px"},
+            children=[
+                html.Div(
+                    style={
+                        "border":"1px solid #e1e5ea","borderRadius":"18px","padding":"14px",
+                        "boxShadow":"0 6px 22px rgba(0,0,0,0.08)","background":"white",
+                        "height":"calc(100vh - 92px)","position":"sticky","top":"78px",
+                    },
+                    children=[
+                        html.Div("Navigation", style={"fontWeight":"900","marginBottom":"10px"}),
+                        html.Div("• Cockpit Home", style={"marginBottom":"6px"}),
+                        html.Div("• Trading Console Frame", style={"marginBottom":"6px"}),
+                        html.Div("• Risk / Alerts", style={"marginBottom":"6px"}),
+                        html.Div("• System Status", style={"marginBottom":"6px"}),
+                        html.Hr(style={"border":"none","borderTop":"1px solid #edf0f3","margin":"12px 0"}),
+                        html.Div("Rule", style={"fontWeight":"900","marginBottom":"8px"}),
+                        html.Div("No data loading in :8051. Pure GUI shell.", style={"fontSize":"12px","opacity":0.75}),
+                    ],
+                ),
+
+                html.Div(
+                    children=[
+                        html.Div(
+                            style={"display":"grid","gridTemplateColumns":"repeat(4, 1fr)","gap":"12px","marginBottom":"12px"},
+                            children=[
+                                card("Layout Shell", "OK", "Header + sidebar + panels"),
+                                card("Component Library", "NEXT", "Status lights / gauges / tiles"),
+                                card("Interaction Model", "NEXT", "Drill-down + command bar"),
+                                card("Theme Pass", "PENDING", "Your cockpit styling refinement"),
+                            ],
+                        ),
+                        html.Div(
+                            style={"display":"grid","gridTemplateColumns":"1.25fr 0.75fr","gap":"12px"},
+                            children=[
+                                panel("Primary Instruments Bay (placeholder)",
+                                      html.Div("Your instrument cluster modules plug in here.", style={"opacity":0.75})),
+                                panel("Alerts / Actions Stack (placeholder)",
+                                      html.Ul([html.Li("Alert styling placeholder"),
+                                               html.Li("Action list placeholder"),
+                                               html.Li("Footer status strip placeholder")], style={"marginTop":"0"})),
+                            ],
+                        ),
+                    ]
+                ),
+            ],
+        ),
+
+        build_stamp(),
+    ],
+)
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=8051, debug=False)

@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+
+# OS / editor
+.DS_Store
+
+# Logs / runtime
+logs/
+*.log
+
+# Backups / archives
+backups/
+_archive_old/
+*.bak
+*.save
+
+# Data artifacts (keep out of git unless you explicitly want them tracked)
+*.xlsx
+*.csv

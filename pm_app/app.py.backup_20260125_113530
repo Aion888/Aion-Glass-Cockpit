@@ -1,0 +1,49 @@
+import pandas as pd
+from dash import Dash, dcc, html
+from dash.dash_table import DataTable
+
+FILE = "Project_Aion_PM_System.xlsx"  # put the Excel in this same folder, or change to a full path
+
+def load():
+    xls = pd.ExcelFile(FILE)
+    tickets = pd.read_excel(xls, "04_Tickets", header=3).fillna("")
+    roadmap = pd.read_excel(xls, "02_Roadmap", header=3).fillna("")
+    return tickets, roadmap
+
+tickets, roadmap = load()
+
+app = Dash(__name__)
+app.layout = html.Div(
+    style={"padding": "16px", "fontFamily": "Arial"},
+    children=[
+        html.H2("Project Aion — PM System"),
+        html.Div("PM app running on port 8051 (separate from Glass Cockpit on 8050)."),
+        dcc.Tabs([
+            dcc.Tab(label="Tickets", children=[
+                DataTable(
+                    data=tickets.to_dict("records"),
+                    columns=[{"name": c, "id": c} for c in tickets.columns],
+                    page_size=15,
+                    filter_action="native",
+                    sort_action="native",
+                    style_table={"overflowX": "auto"},
+                    style_cell={"padding": "6px", "whiteSpace": "normal", "height": "auto"},
+                )
+            ]),
+            dcc.Tab(label="Roadmap", children=[
+                DataTable(
+                    data=roadmap.to_dict("records"),
+                    columns=[{"name": c, "id": c} for c in roadmap.columns],
+                    page_size=15,
+                    filter_action="native",
+                    sort_action="native",
+                    style_table={"overflowX": "auto"},
+                    style_cell={"padding": "6px", "whiteSpace": "normal", "height": "auto"},
+                )
+            ]),
+        ]),
+    ],
+)
+
+if __name__ == "__main__":
+    app.run(debug=True, port=8051)
