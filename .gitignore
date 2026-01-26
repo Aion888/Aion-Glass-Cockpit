@@ -20,8 +20,6 @@ _archive_old/
 *.save
 
 # Data artifacts (keep out of git unless you explicitly want them tracked)
-
-# --- local/env ---
 aion_env/
 .venv/
 __pycache__/
@@ -29,9 +27,6 @@ __pycache__/
 
 
 # --- editor / scratch files ---
-*app.pynano*
-.DS_Store
-
 # --- backups ---
 *.bak_*
 *.save
