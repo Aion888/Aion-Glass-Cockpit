@@ -303,34 +303,13 @@ def render_overview_tab():
                     {"name": "Value", "id": "Value", "editable": True},
                 ],
                 editable=True,
+                cell_selectable=True,
                 row_deletable=False,
-                css=[
-                    {"selector":"input", "rule":"text-align: center;"},
-                    {"selector":"textarea", "rule":"text-align: center;"},
-                ],
                 page_size=25,
-                style_table={"overflowX":"auto", "width":"100%"},
-                style_header={"fontWeight":"700","fontFamily":"Arial","textAlign":"center"},
-                style_cell={
-                    "padding":"10px",
-                    "whiteSpace":"normal",
-                    "height":"auto",
-                    "lineHeight":"1.35",
-                    "fontFamily":"Arial",
-                    "fontSize":"14px",
-                    "textAlign":"center",
-                    "verticalAlign":"top",
-                },
-                style_cell_conditional=[
-                    {"if":{"column_id":"Field"}, "textAlign":"center", "fontWeight":"700", "width":"28%", "minWidth":"220px", "whiteSpace":"nowrap"},
-                    {"if":{"column_id":"Value"}, "textAlign":"center", "width":"72%"},
-                ],
-                style_data_conditional=[
-                    {"if":{"row_index":"odd"}, "backgroundColor":"#fafafa"},
-                    {"if":{"column_id":"Field"}, "fontWeight":"700"},
-                ],
+                style_table={"overflowX": "auto", "width": "100%"},
+                style_header={"fontWeight": "700", "textAlign": "center", "fontFamily": "Arial"},
+                style_cell={"padding": "10px", "fontFamily": "Arial", "fontSize": "14px"},
             ),
-
             html.Hr(),
             html.H4("Project Index (repo)"),
             DataTable(
@@ -367,6 +346,7 @@ def render_overview_tab():
                 data=(charter_tbl.to_dict("records") if "charter_tbl" in globals() else []),
                 columns=[{"name":"Field","id":"Field","editable":False},{"name":"Value","id":"Value","editable":True}],
                 editable=True,
+                cell_selectable=True,
                 page_size=25,
                 style_table={"overflowX":"auto", "width":"100%"},
                 style_header={"fontWeight":"700","fontFamily":"Arial","textAlign":"center"},
@@ -420,40 +400,60 @@ app.index_string = """
 </html>
 """
 
+
 app.layout = html.Div(
     style=BASE_STYLE,
     children=[
-        html.Img(
-            src=app.get_asset_url('logos/aion_logo.png'),
+                html.Div(
             style={
-                'position': 'absolute',
-                'top': '14px',
-                'right': '18px',
-                'height': '56px',
-                'width': '56px',
-                'opacity': 0.98,
-                'display': 'block',
+                "border": "1px solid #ddd",
+                "borderRadius": "16px",
+                "padding": "32px 18px",
+                "minHeight": "120px",
+                "marginBottom": "12px",
+                "backgroundColor": "white",
+                "boxShadow": "0 1px 2px rgba(0,0,0,0.06)",
+                "pointerEvents": "none",
             },
+            children=[
+                html.Div(
+                    style={"display":"flex","alignItems":"center","justifyContent":"space-between","gap":"14px"},
+                    children=[
+                        html.Div(
+                            style={"display":"flex","flexDirection":"column","alignItems":"center","gap":"6px","marginLeft":"11px"},
+                            children=[
+                                html.Img(
+                                    src=app.get_asset_url("logos/aion_logo.png"),
+                                    style={
+                                        "height":"72px",
+                                        "width":"72px",
+                                        "opacity": 0.98,
+                                        "display":"block",
+                                    },
+                                ),
+                                html.Div(
+                                    AION_UI_VERSION,
+                                    style={
+                                        "fontSize":"12px",
+                                        "fontWeight":800,
+                                        "letterSpacing":"0.06em",
+                                        "color":"#6b7280",
+                                        "lineHeight":"1","textAlign":"center","width":"72px",
+                                    },
+                                ),
+                            ],
+                        ),
+                        html.H2(
+                            "Project Aion — PM System",
+                            style={"fontFamily":"Arial","textAlign":"right","margin":"0"},
+                        ),
+                    ],
+                )
+            ],
         ),
 
-        html.Div(
-            AION_UI_VERSION,
-            style={
-                'position': 'absolute',
-                'top': '74px',
-                'right': '18px',
-                'fontSize': '12px',
-                'fontWeight': 800,
-                'letterSpacing': '0.06em',
-                'color': '#6b7280',
-                'textAlign': 'right',
-                'lineHeight': '1',
-            },
-        ),
-
-
-        html.H2("Project Aion — PM System", style={"fontFamily":"Arial"}),
         html.Hr(),
+
 
         dcc.Store(id="tickets_store", data=tickets_df.to_dict("records")),
         dcc.Store(id="decisions_store", data=decisions_df.to_dict("records")),
