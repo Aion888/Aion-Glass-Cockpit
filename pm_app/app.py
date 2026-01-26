@@ -249,6 +249,15 @@ def load_overview():
     except Exception:
         return DEFAULT_OVERVIEW.copy()
 
+
+def load_project_index():
+    path = os.path.join(DATA_DIR, "project_index.json")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f) or {}
+    except Exception:
+        return {}
+
 def save_overview(d: dict):
     os.makedirs(DATA_DIR, exist_ok=True)
     payload = dict(d)
@@ -323,7 +332,36 @@ def render_overview_tab():
             ),
 
             html.Hr(),
+            html.H4("Project Index (repo)"),
+            DataTable(
+                id="tbl-project-index",
+                data=[],
+                columns=[{"name":"Section","id":"Section"},{"name":"Path","id":"Path"}],
+                page_size=25,
+                style_table={"overflowX":"auto", "width":"100%"},
+                style_header={"fontWeight":"700","fontFamily":"Arial","textAlign":"center"},
+                style_cell={
+                    "padding":"10px",
+                    "whiteSpace":"normal",
+                    "height":"auto",
+                    "lineHeight":"1.35",
+                    "fontFamily":"Arial",
+                    "fontSize":"14px",
+                    "textAlign":"left",
+                    "verticalAlign":"top",
+                },
+                style_cell_conditional=[
+                    {"if":{"column_id":"Section"}, "width":"22%", "minWidth":"180px", "whiteSpace":"nowrap", "textAlign":"center", "fontWeight":"700"},
+                    {"if":{"column_id":"Path"}, "width":"78%", "textAlign":"left"},
+                ],
+                style_data_conditional=[
+                    {"if":{"row_index":"odd"}, "backgroundColor":"#fafafa"},
+                ],
+            ),
+
+            html.Hr(),
             html.H4("Project Charter (existing data)"),
+
             DataTable(
                 id="tbl-charter",
                 data=(charter_tbl.to_dict("records") if "charter_tbl" in globals() else []),
@@ -885,3 +923,16 @@ def _save_overview(n_clicks, rows):
     save_overview(d)
     saved = load_overview().get("_last_saved", "")
     return f"Saved: {saved}"
+
+
+@app.callback(
+    Output("tbl-project-index", "data"),
+    Input("autosave", "n_intervals"),
+)
+def _load_project_index_table(_n):
+    idx = load_project_index()
+    rows = []
+    for section in ("docs", "data"):
+        for path in (idx.get(section) or []):
+            rows.append({"Section": section, "Path": path})
+    return rows
