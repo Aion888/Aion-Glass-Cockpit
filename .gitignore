@@ -31,3 +31,5 @@ __pycache__/
 *.bak_*
 *.save
 
+
+*app.pynano*
