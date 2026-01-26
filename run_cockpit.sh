@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 source aion_env/bin/activate
-lsof -tiTCP:8051 -sTCP:LISTEN | xargs -r kill -9
+lsof -tiTCP:8051 -sTCP:LISTEN | xargs -r kill -9 || true || true
 nohup ./aion_env/bin/python -m pm_app.cockpit </dev/null > logs/cockpit_8051.log 2>&1 &
 disown
 sleep 1
