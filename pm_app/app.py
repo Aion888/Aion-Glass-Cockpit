@@ -158,6 +158,20 @@ def load_decisions():
 
 # ---------- Initial data ----------
 charter_tbl = load_charter()
+# --- Clean Charter rows we don't want displayed ---
+try:
+    # Drop rows where Field is literally "Field" or "Notes"
+    if "Field" in charter_tbl.columns:
+        _f = charter_tbl["Field"].astype(str).str.strip()
+        charter_tbl = charter_tbl[~_f.str.lower().isin(["field","notes"])]
+
+    # Drop any row containing the helper text (match on any column; robust to where it appears)
+    _needle = "Fill these in once"
+    _hit = charter_tbl.apply(lambda c: c.astype(str).str.contains(_needle, na=False))
+    charter_tbl = charter_tbl[~_hit.any(axis=1)]
+except Exception:
+    pass
+
 roadmap_df = load_roadmap()
 
 tickets_df = load_tickets()
@@ -283,8 +297,9 @@ def render_overview_tab():
     rows = overview_to_rows(d)
     last_saved = d.get("_last_saved", "")
 
-    return html.Div(
-        style={"maxWidth": "1000px"},
+    # Keep these components for callback wiring, but hide them from the UI.
+    hidden_overview_and_index = html.Div(
+        style={"display": "none"},
         children=[
             html.H3("Overview"),
             dcc.Store(id="store-overview", data=rows),
@@ -303,74 +318,102 @@ def render_overview_tab():
                     {"name": "Value", "id": "Value", "editable": True},
                 ],
                 editable=True,
-                cell_selectable=True,
                 row_deletable=False,
+                css=[
+                    {"selector": "input", "rule": "text-align: center;"},
+                    {"selector": "textarea", "rule": "text-align: center;"},
+                ],
                 page_size=25,
                 style_table={"overflowX": "auto", "width": "100%"},
-                style_header={"fontWeight": "700", "textAlign": "center", "fontFamily": "Arial"},
-                style_cell={"padding": "10px", "fontFamily": "Arial", "fontSize": "14px"},
+                style_header={"fontWeight": "700", "fontFamily": "Arial", "textAlign": "center"},
+                style_cell={
+                    "padding": "10px",
+                    "whiteSpace": "normal",
+                    "height": "auto",
+                    "lineHeight": "1.35",
+                    "fontFamily": "Arial",
+                    "fontSize": "14px",
+                    "textAlign": "center",
+                    "verticalAlign": "top",
+                },
+                style_cell_conditional=[
+                    {"if": {"column_id": "Field"}, "textAlign": "center", "fontWeight": "700", "width": "28%", "minWidth": "220px", "whiteSpace": "nowrap"},
+                    {"if": {"column_id": "Value"}, "textAlign": "center", "width": "72%"},
+                ],
+                style_data_conditional=[
+                    {"if": {"row_index": "odd"}, "backgroundColor": "#fafafa"},
+                    {"if": {"column_id": "Field"}, "fontWeight": "700"},
+                ],
             ),
             html.Hr(),
             html.H4("Project Index (repo)"),
             DataTable(
                 id="tbl-project-index",
                 data=[],
-                columns=[{"name":"Section","id":"Section"},{"name":"Path","id":"Path"}],
+                columns=[{"name": "Section", "id": "Section"}, {"name": "Path", "id": "Path"}],
                 page_size=25,
-                style_table={"overflowX":"auto", "width":"100%"},
-                style_header={"fontWeight":"700","fontFamily":"Arial","textAlign":"center"},
+                style_table={"overflowX": "auto", "width": "100%"},
+                style_header={"fontWeight": "700", "fontFamily": "Arial", "textAlign": "center"},
                 style_cell={
-                    "padding":"10px",
-                    "whiteSpace":"normal",
-                    "height":"auto",
-                    "lineHeight":"1.35",
-                    "fontFamily":"Arial",
-                    "fontSize":"14px",
-                    "textAlign":"left",
-                    "verticalAlign":"top",
+                    "padding": "10px",
+                    "whiteSpace": "normal",
+                    "height": "auto",
+                    "lineHeight": "1.35",
+                    "fontFamily": "Arial",
+                    "fontSize": "14px",
+                    "textAlign": "left",
+                    "verticalAlign": "top",
                 },
                 style_cell_conditional=[
-                    {"if":{"column_id":"Section"}, "width":"22%", "minWidth":"180px", "whiteSpace":"nowrap", "textAlign":"center", "fontWeight":"700"},
-                    {"if":{"column_id":"Path"}, "width":"78%", "textAlign":"left"},
+                    {"if": {"column_id": "Section"}, "width": "22%", "minWidth": "180px", "whiteSpace": "nowrap", "textAlign": "center", "fontWeight": "700"},
+                    {"if": {"column_id": "Path"}, "width": "78%", "textAlign": "left"},
                 ],
                 style_data_conditional=[
-                    {"if":{"row_index":"odd"}, "backgroundColor":"#fafafa"},
-                ],
-            ),
-
-            html.Hr(),
-            html.H4("Project Charter (existing data)"),
-
-            DataTable(
-                id="tbl-charter",
-                data=(charter_tbl.to_dict("records") if "charter_tbl" in globals() else []),
-                columns=[{"name":"Field","id":"Field","editable":False},{"name":"Value","id":"Value","editable":True}],
-                editable=True,
-                cell_selectable=True,
-                page_size=25,
-                style_table={"overflowX":"auto", "width":"100%"},
-                style_header={"fontWeight":"700","fontFamily":"Arial","textAlign":"center"},
-                style_cell={
-                    "padding":"10px",
-                    "whiteSpace":"normal",
-                    "height":"auto",
-                    "lineHeight":"1.35",
-                    "fontFamily":"Arial",
-                    "fontSize":"14px",
-                    "textAlign":"center",
-                    "verticalAlign":"top",
-                },
-                style_cell_conditional=[
-                    {"if":{"column_id":"Field"}, "width":"28%", "minWidth":"220px", "whiteSpace":"nowrap", "textAlign":"center", "fontWeight":"700"},
-                    {"if":{"column_id":"Value"}, "width":"72%", "textAlign":"center"},
-                ],
-                style_data_conditional=[
-                    {"if":{"row_index":"odd"}, "backgroundColor":"#fafafa"},
-                    {"if":{"column_id":"Field"}, "fontWeight":"700"},
+                    {"if": {"row_index": "odd"}, "backgroundColor": "#fafafa"},
                 ],
             ),
         ],
     )
+
+    # Visible: Charter only
+    return html.Div(
+        style={"maxWidth":"1400px","width":"100%"},
+        children=[
+            hidden_overview_and_index,
+DataTable(
+                id="tbl-charter",
+                data=(charter_tbl.to_dict("records") if "charter_tbl" in globals() else []),
+                columns=[
+                    {"name": "Field", "id": "Field", "editable": False},
+                    {"name": "Value", "id": "Value", "editable": True},
+                ],
+                editable=True,
+                page_size=25,
+                  fill_width=True,
+                style_table={"overflowX":"auto","width":"100%","minWidth":"100%"},
+                style_header={"display":"none"},
+                style_cell={
+                    "padding": "10px",
+                    "whiteSpace": "normal",
+                    "height": "auto",
+                    "lineHeight": "1.35",
+                    "fontFamily": "Arial",
+                    "fontSize": "14px",
+                    "textAlign": "center",
+                    "verticalAlign": "top",
+                },
+                style_cell_conditional=[
+                      {"if":{"column_id":"Field"}, "width":"220px", "minWidth":"220px", "maxWidth":"220px", "whiteSpace":"nowrap", "textAlign":"center", "fontWeight":"700"},
+                      {"if":{"column_id":"Value"}, "width":"auto", "textAlign":"center"},
+                  ],
+                style_data_conditional=[
+                    {"if": {"row_index": "odd"}, "backgroundColor": "#fafafa"},
+                    {"if": {"column_id": "Field"}, "fontWeight": "700"},
+                ],
+            ),
+        ],
+    )
+
 
 
 app = Dash(__name__, prevent_initial_callbacks="initial_duplicate")

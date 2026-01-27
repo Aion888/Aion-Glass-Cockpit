@@ -1,0 +1,19 @@
+/* Cockpit control buttons: Top 1-10 + bottom 5 */
+button[id^="ctl_top_"],
+button[id^="ctl_action_"] {
+  background-color: #e5e7eb !important; /* light grey */
+  border: 1px solid #d1d5db !important;
+  box-shadow: none !important;
+}
+
+/* Hide the 1–10 labels (without changing layout code) */
+button[id^="ctl_top_"] {
+  color: transparent !important;
+  text-shadow: none !important;
+}
+
+/* Optional: subtle hover */
+button[id^="ctl_top_"]:hover,
+button[id^="ctl_action_"]:hover {
+  background-color: #dbe0e6 !important;
+}

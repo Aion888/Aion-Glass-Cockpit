@@ -1,0 +1,7 @@
+# Master Directory Tree (generated UTC 2026-01-27T00:29:45+00:00)
+
+docs/
+└── scope_contract.md
+
+notebooks/01_framework/
+└── 01_Master_Index_Narration.ipynb

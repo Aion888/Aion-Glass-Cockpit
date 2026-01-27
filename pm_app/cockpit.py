@@ -36,7 +36,7 @@ def column_header_row():
     )
 
 
-def aion_status_label(raw, fallback: str = 'PRE-RACE') -> str:
+def aion_status_label(raw, fallback: str = 'PULSE') -> str:
     """Map a raw race status to a canonical label (safe; no globals required)."""
     states = globals().get('AION_RACE_STATUS_STATES', [])
     key = (raw or '').strip().upper()
@@ -165,16 +165,15 @@ def aion_ttm_label(ttm_min) -> str:
     return f"{int(round(m))}m"
 
 AION_TILE_STYLE = {
-    "width": "80px",
-    "minWidth": "80px",
-    "paddingRight": "54px",
+    "width": "95px",
+    "minWidth": "95px",
     "position": "relative",
     "minWidth":"111px",
     "height":"34px",
     "borderRadius": "14px",
     "border": "1px solid #e5e7eb",
     "background": "#f8fafc",
-    "padding":"6px 10px",
+    "padding":"6px 6px",
     "boxShadow": "0 6px 18px rgba(0,0,0,0.06)",
     "display": "flex",
     "flexDirection": "column",
@@ -187,6 +186,34 @@ def aion_upcoming_tile(r: dict):
     rn = r.get("race_no", "")
     ttm = aion_ttm_label(r.get("ttm_min"))
 
+    # TEMP OVERRIDE: SHAT R1
+    if (str(r.get('track_code') or '').upper().startswith('SHAT')) and (str(rn) == '1'):
+        trk = 'SHATI'
+        ttm = '1m'
+    # TEMP OVERRIDE: MEYD R3
+    if (str(r.get('track_code') or '').upper().startswith('MEYD')) and (str(rn) == '3'):
+        cc = 'HK'
+        trk = 'SHATI'
+        rn = 2
+        ttm = '36m'
+    # TEMP OVERRIDE: ASCOT R6
+    if (str(r.get('track_code') or '').upper().startswith('ASCOT')) and (str(rn) == '6'):
+        cc = 'HK'
+        trk = 'SHATI'
+        rn = 3
+        ttm = '71m'
+    # TEMP OVERRIDE: DEAUV R2
+    if (str(r.get('track_code') or '').upper().startswith('DEAUV')) and (str(rn) == '2'):
+        cc = 'HK'
+        trk = 'SHATI'
+        rn = 4
+        ttm = '106m'
+    # TEMP OVERRIDE: DOHA R7
+    if (str(r.get('track_code') or '').upper().startswith('DOHA')) and (str(rn) == '7'):
+        cc = 'HK'
+        trk = 'SHATI'
+        rn = 5
+        ttm = '141m'
     return html.Div(
         style=AION_TILE_STYLE,
         children=[
@@ -197,8 +224,8 @@ def aion_upcoming_tile(r: dict):
                     "position": "absolute",
                     "top":"7px",
                     "right": "8px",
-                    "height":"22px",
-                    "width":"40px",
+                    "height":"15px",
+                    "width":"27px",
                     "borderRadius": "4px",
                     "objectFit": "contain",
                     "boxShadow": "0 2px 6px rgba(0,0,0,0.12)",
@@ -253,10 +280,10 @@ app.title = 'Project Aion — Glass Cockpit'
 # __AION_DEFAULTS__ (safe placeholders until live feed is wired)
 country_code = globals().get('country_code', 'HK')
 track_name    = globals().get('track_name', 'SHA TIN')
-race_status   = globals().get('race_status', 'PRE-RACE')
+race_status   = globals().get('race_status', 'PULSE')
 race_type     = globals().get('race_type', 'TB')
 upcoming_races = globals().get('upcoming_races', [
-    {'country_code':'HK','track_code':'SHAT','race_no':1,'ttm_min':12},
+    {'country_code':'HK','track_code':'SHATI','race_no':1,'ttm_min':1},
     {'country_code':'HK','track_code':'SHAT','race_no':2,'ttm_min':28},
     {'country_code':'HK','track_code':'SHAT','race_no':3,'ttm_min':44},
     {'country_code':'HK','track_code':'SHAT','race_no':4,'ttm_min':60},
@@ -277,6 +304,89 @@ app.layout = html.Div(
         "paddingBottom": "72px",
     },
     children=[
+        # --- AION: CONTROLS_BLOCK_V1 ---
+        html.Div(
+            id="cockpit-controls",
+            style={
+                "position": "absolute",
+                # These two numbers control placement under the Upcoming Race buttons:
+                "top": "105px",
+                "left": "1560px",
+                "zIndex": 20,
+                "display": "flex",
+                "flexDirection": "column",
+                "gap": "10px",
+                "alignItems": "flex-start",
+            },
+            children=[
+                # Top row: 10 buttons (black)
+                html.Div(
+                    style={"display":"flex","gap":"8px","flexWrap":"wrap","alignItems":"center"},
+                    children=[
+                        html.Button(
+                            str(i),
+                            id=f"ctl_top_{i}",
+                            n_clicks=0,
+                            style={
+                                "backgroundColor":"#111",
+                                "color":"#fff",
+                                "border":"1px solid #111",
+                                "borderRadius":"12px",
+                                "height":"34px",
+                                "minWidth":"68px",
+                                "fontFamily":"Arial",
+                                "fontWeight":700,
+                                "cursor":"pointer",
+                            },
+                        )
+                        for i in range(1, 11)
+                    ],
+                ),
+
+                # Bottom row: 5 buttons (no label) + search input
+                html.Div(
+                    style={
+                        "marginTop":"6px","display":"flex","gap":"8px","flexWrap":"wrap","alignItems":"center"},
+                    children=[
+                        *[
+                            html.Button(
+                                "\u00A0",
+                                id=f"ctl_action_{i}",
+                                n_clicks=0,
+                                style={
+                                    "backgroundColor":"#111",
+                                    "color":"#fff",
+                                    "border":"1px solid #111",
+                                    "borderRadius":"12px",
+                                    "height":"34px",
+                                    "minWidth":"68px",
+                                    "fontFamily":"Arial",
+                                    "fontWeight":700,
+                                    "cursor":"pointer",
+                                },
+                            )
+                            for i in range(1, 6)
+                        ],
+                        dcc.Input(
+                            id="ctl_search",
+                            type="text",
+                            placeholder="Search...",
+                            style={"width":"354px","maxWidth":"220px","flex":"0 0 220px",
+                        
+                        
+                        
+"height":"34px",
+                                "padding":"0 12px",
+                                "border":"1px solid #ddd",
+                                "borderRadius":"10px",
+                                "minWidth":"354px",
+                                "fontFamily":"Arial",
+                            },
+                        ),
+                    ],
+                ),
+            ],
+        ),
         # ================= HEADER REALM =================
         html.Div(
             style={
@@ -311,15 +421,15 @@ app.layout = html.Div(
                         ),
                         html.Div(
                             # Right cluster: Upcoming tiles (left) + Race Status/Version (right)
-                            style={'display':'flex','alignItems':'center','justifyContent':'flex-end','gap':'24px','minWidth':0},
+                            style={'display':'flex','alignItems':'center','justifyContent':'flex-end','gap':'1px','minWidth':0,'transform':'translateX(-60px)'},
                             children=[
                             html.Div(
                                 # Upcoming races (max 6) — pinned immediately left of status/version
                                 style={
                                     'display':'flex',
-                                    'paddingLeft':'12px',
-                                    'paddingRight':'16px',
-                                    'gap':'8px',
+                                    'paddingLeft': '6px',
+                                    'paddingRight': '6px',
+                                    'gap': '4px',
                                     'alignItems':'center',
                                     'justifyContent':'flex-start',
                                     'minWidth':0,
@@ -327,13 +437,13 @@ app.layout = html.Div(
                                     'overflowY':'hidden',
                                     'whiteSpace':'nowrap',
                                     'WebkitOverflowScrolling':'touch',
-        'maxWidth':'980px',
-        'flex':'0 1 980px',
+        'maxWidth': '760px',
+        'flex':'0 0 auto',
                                 },
                                 children=[aion_upcoming_tile(r) for r in aion_upcoming_pad((upcoming_races or []), 6)],
                             ),
                             html.Div(
-                                style={'display':'flex','flexDirection':'column','alignItems':'center','justifyContent':'center','gap':'2px','height':'72px','minWidth':'120px','position':'relative','overflow':'visible'},
+                                style={'display':'flex','flexDirection':'column','alignItems':'center','justifyContent':'center','gap':'2px','height':'72px','minWidth':'120px','position':'relative','overflow':'visible','transform':'translateX(60px)'},
                                 children=[
                                 html.Div(aion_status_label(globals().get('race_status', None)), style={'fontSize':'14px','fontWeight':900,'letterSpacing':'0.14em','color':'#2563eb','textAlign':'center'}),
                                 html.Div(AION_UI_VERSION, style={'fontSize':'12px','fontWeight':800,'letterSpacing':'0.06em','color':'#6b7280','textAlign':'center'}),
@@ -367,7 +477,7 @@ app.layout = html.Div(
                         style={
                             "display": "grid",
                             "gridTemplateColumns": "56px 1.6fr 1fr 1fr 1fr 112px",
-                            "gap": "12px",
+                            "gap": "4px",
                             "padding": "10px 0",
                         },
                         children=[
@@ -403,10 +513,85 @@ app.layout = html.Div(
                 "padding": "0 24px",
             },
             children=[
-                html.Div("AION CONTROL BAR (buttons later)", style={"color": "#64748b"}),
+                html.Div("", style={"color": "#64748b"}),
             ],
         ),
-    ],
+    
+        # --- AION: FOOTER_PLACEHOLDERS_V1 ---
+        html.Div(
+            id="aion-footer-placeholders",
+            style={
+                "position": "fixed",
+                "left": "0px",
+                "right": "0px",
+                "bottom": "0px",
+                "height": "60px",
+                "background": "#2b2b2b",
+                "borderTop": "1px solid rgba(255,255,255,0.10)",
+                "display": "flex",
+                "alignItems": "center",
+                "justifyContent": "space-between",
+                "padding": "0 18px",
+                "zIndex": 50,
+            },
+            children=[
+                # Left edge button
+                html.Button(
+                    "\u00A0",
+                    id="footer_edge_left",
+                    n_clicks=0,
+                    style={
+                        "backgroundColor":"#e5e7eb",
+                        "color":"#fff",
+                        "border":"1px solid #9ca3af",
+                        "borderRadius":"0px",
+                        "height":"44px",
+                        "minWidth":"108px",
+                        "cursor":"pointer",
+                    },
+                ),
+        
+                # Center 9 placeholders
+                html.Div(
+                    style={"flex":"1","display":"flex","justifyContent":"center","alignItems":"center","gap":"4px"},
+                    children=[
+                        html.Button(
+                            "\u00A0",
+                            id=f"footer_btn_{i}",
+                            n_clicks=0,
+                            style={
+                                "backgroundColor":"#e5e7eb",
+                                "color":"#fff",
+                                "border":"1px solid #9ca3af",
+                                "borderRadius":"0px",
+                                "height":"44px",
+                                "minWidth":"108px",
+                                "cursor":"pointer",
+                            },
+                        )
+                        for i in range(1, 10)
+                    ],
+                ),
+        
+                # Right edge button
+                html.Button(
+                    "\u00A0",
+                    id="footer_edge_right",
+                    n_clicks=0,
+                    style={
+                        "backgroundColor":"#e5e7eb",
+                        "color":"#fff",
+                        "border":"1px solid #9ca3af",
+                        "borderRadius":"0px",
+                        "height":"44px",
+                        "minWidth":"108px",
+                        "cursor":"pointer",
+                    },
+                ),
+            ],
+        ),
+
+],
 )
 
 # ================= RUN COCKPIT =================
