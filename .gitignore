@@ -34,3 +34,6 @@ __pycache__/
 
 *app.pynano*
 data/project_index.json
+
+# Generated reports
+/data/pm_drift_report.csv
