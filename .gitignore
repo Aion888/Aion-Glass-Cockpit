@@ -37,3 +37,6 @@ data/project_index.json
 
 # Generated reports
 /data/pm_drift_report.csv
+
+# Generated reports
+/data/pm_drift_report.csv
