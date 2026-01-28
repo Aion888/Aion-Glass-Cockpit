@@ -9,6 +9,7 @@
 Project_Aion/01_Project_Framework
 ├── 00_Master_Index
 │   ├── Framework_Directory_Spec
+│   │   ├── 00_Triage_Inbox.md
 │   │   ├── 01_Project_Framework.md
 │   │   ├── 02_Glass_Cockpit_GUI.md
 │   │   ├── 03_Artifacts.md
@@ -34,7 +35,7 @@ Project_Aion/01_Project_Framework
     ├── README.md
     └── {00_Overview}
 
-9 directories, 18 files
+9 directories, 19 files
 ```
 <!-- TREE:END -->
 
