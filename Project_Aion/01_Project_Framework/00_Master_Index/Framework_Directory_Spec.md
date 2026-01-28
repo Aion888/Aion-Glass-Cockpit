@@ -4,6 +4,7 @@ This file is the navigation hub. Detailed realm specs live in:
 `Project_Aion/01_Project_Framework/00_Master_Index/Framework_Directory_Spec/`
 
 ## Realms
+- [00 Triage Inbox](./Framework_Directory_Spec/00_Triage_Inbox.md)
 - [01 Project Framework](./Framework_Directory_Spec/01_Project_Framework.md)
 - [02 Glass Cockpit GUI](./Framework_Directory_Spec/02_Glass_Cockpit_GUI.md)
 - [03 Artifacts](./Framework_Directory_Spec/03_Artifacts.md)

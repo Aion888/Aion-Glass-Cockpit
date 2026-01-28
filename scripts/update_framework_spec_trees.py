@@ -11,6 +11,7 @@ END_RE   = re.compile(r"<!-- TREE:END -->")
 
 # Map realm spec filename -> real folder path in repo
 REALM_PATHS = {
+    "00_Triage_Inbox.md": "Project_Aion/00_Triage_Inbox",
     "01_Project_Framework.md": "Project_Aion/01_Project_Framework",
     "02_Glass_Cockpit_GUI.md": "Project_Aion/02_Glass_Cockpit_GUI",
     "03_Artifacts.md": "Project_Aion/03_Artifacts",
