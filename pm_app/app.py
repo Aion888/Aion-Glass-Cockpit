@@ -1,3 +1,9 @@
+
+
+def load_decisions():
+    cols = ["Decision_ID","Date","Decision","Owner","Status","Notes"]
+    return safe_read_csv(DECISIONS_CSV, cols)
+
 import os
 import time
 
@@ -9,6 +15,22 @@ AION_UI_VERSION = time.strftime('%Y%m%d') + '_V01'
 import re
 import hashlib
 import pandas as pd
+
+from pandas.errors import EmptyDataError
+
+def safe_read_csv(path, columns):
+    """Read CSV safely. If missing/empty, return empty DF with provided columns."""
+    import pandas as pd
+    try:
+        df = pd.read_csv(path)
+    except (FileNotFoundError, EmptyDataError):
+        return pd.DataFrame(columns=columns).fillna("")
+    # If file has headers but no rows, still ok; ensure expected columns exist
+    for c in columns:
+        if c not in df.columns:
+            df[c] = ""
+    return df[columns].fillna("")
+
 from datetime import datetime
 from dash import Dash, dcc, html, Input, Output, State, no_update
 from dash.dash_table import DataTable
@@ -145,16 +167,28 @@ def load_tickets():
     return load_tickets_seed_from_excel()
 
 def load_decisions_seed_from_excel():
+    """Load decisions table from CSV; tolerate missing/empty files."""
+    import pandas as pd
+    from pandas.errors import EmptyDataError
     try:
-        xls = pd.ExcelFile(EXCEL_FILE)
-        return pd.read_excel(xls, "06_Decisions_Log", header=3).fillna("")
-    except Exception:
-        return pd.DataFrame()
+        df = pd.read_csv(DECISIONS_CSV)
+    except FileNotFoundError:
+        return pd.DataFrame(columns=["Decision_ID","Date","Decision","Owner","Status","Notes"]).fillna("")
+    except EmptyDataError:
+        return pd.DataFrame(columns=["Decision_ID","Date","Decision","Owner","Status","Notes"]).fillna("")
+    return df.fillna("")
 
 def load_decisions():
-    if os.path.exists(DECISIONS_CSV):
-        return pd.read_csv(DECISIONS_CSV).fillna("")
-    return load_decisions_seed_from_excel().fillna("")
+    """Load decisions table from CSV; tolerate missing/empty files."""
+    import pandas as pd
+    from pandas.errors import EmptyDataError
+    try:
+        df = pd.read_csv(DECISIONS_CSV)
+    except FileNotFoundError:
+        return pd.DataFrame(columns=["Decision_ID","Date","Decision","Owner","Status","Notes"]).fillna("")
+    except EmptyDataError:
+        return pd.DataFrame(columns=["Decision_ID","Date","Decision","Owner","Status","Notes"]).fillna("")
+    return df.fillna("")
 
 # ---------- Initial data ----------
 charter_tbl = load_charter()
