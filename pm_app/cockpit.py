@@ -246,7 +246,7 @@ def aion_upcoming_tile(r: dict):
                 f"{ttm}" if ttm else "",
                 style={
                     "marginTop": "4px",
-                    "fontSize": "12px",
+                    "fontSize": "13px",
                     "fontWeight": 900,
                     "letterSpacing": "0.10em",
                     "color": "#2563eb",
@@ -296,6 +296,104 @@ AION_UI_VERSION = time.strftime("%Y%m%d") + "_V01"
 
 
 
+
+from datetime import date
+
+ISO_CODES = ["HK", "AU", "US", "UK", "JP"]
+
+PLACEHOLDER_BTN = {
+    "height": "34px",
+    "minWidth": "46px",
+    "padding": "0 10px",
+    "border": "1px solid #d9d9d9",
+    "borderRadius": "10px",
+    "fontWeight": "800",
+    "backgroundColor": "#f5f5f5",
+    "color": "#111",
+    "cursor": "not-allowed",
+}
+
+country_date_placeholders = html.Div(
+    [
+        html.Div(
+            [
+                html.Div("TERRITORY", style={"fontSize": "10px", "fontWeight": "900", "letterSpacing": "0.6px", "marginBottom": "6px"}),
+                html.Div(
+                    "",
+                    style={
+                        "height": "34px",
+        "minWidth": "180px",
+                        "display": "flex",
+                        "alignItems": "center",
+                        "padding": "0 12px",
+        "border": "1px solid #d9d9d9",
+        "borderRadius": "10px",
+        "backgroundColor": "#f5f5f5",
+        "fontWeight": "800",
+        "color": "#111",
+                    },
+                ),
+
+            ],
+            style={"display": "flex", "flexDirection": "column"},
+        ),
+        html.Div(
+            [
+                html.Div("DATE", style={"fontSize": "10px", "fontWeight": "900", "letterSpacing": "0.6px", "marginBottom": "6px"}),
+                html.Div(
+                    str(date.today()),
+                    style={
+                        "height": "34px",
+                        "minWidth": "180px",
+                        "display": "flex",
+                        "alignItems": "center",
+                        "padding": "0 12px",
+                        "border": "1px solid #d9d9d9",
+                        "borderRadius": "10px",
+                        "backgroundColor": "#f5f5f5",
+                        "fontWeight": "800",
+                        "color": "#111",
+                    },
+                ),
+            ],
+            style={"display": "flex", "flexDirection": "column"},
+        ),
+    ],
+    style={"display": "flex", "gap": "18px", "alignItems": "flex-end"},
+),
+# --- AION_CODE_TRACK_FIELDS_V1 ---
+html.Div(
+    style={"display":"flex","gap":"18px","alignItems":"center","marginTop":"10px"},
+    children=[
+        html.Div(
+            style={"display":"flex","flexDirection":"column"},
+            children=[
+                html.Div("CODE", style={"fontSize":"11px","fontWeight":"700","letterSpacing":"1px","marginBottom":"6px"}),
+                dcc.Input(
+                    id="code_placeholder",
+                    value="",
+                    placeholder="",
+                    style={"width":"180px","minWidth":"180px","height":"34px","lineHeight":"34px","borderRadius":"10px","border":"1px solid #d9d9d9","padding":"0 12px","boxSizing":"border-box","backgroundColor":"#f5f5f5","fontWeight":"800","color":"#111"}
+                ),
+            ],
+        ),
+        html.Div(
+            style={"display":"flex","flexDirection":"column"},
+            children=[
+                html.Div("TRACK", style={"fontSize":"11px","fontWeight":"700","letterSpacing":"1px","marginBottom":"6px"}),
+                dcc.Input(
+                    id="track_placeholder",
+                    value="",
+                    placeholder="",
+                    style={"width":"180px","minWidth":"180px","height":"34px","lineHeight":"34px","borderRadius":"10px","border":"1px solid #d9d9d9","padding":"0 12px","boxSizing":"border-box","backgroundColor":"#f5f5f5","fontWeight":"800","color":"#111"}
+                ),
+            ],
+        ),
+    ],
+),
+
+
+
 app.layout = html.Div(
     style={
         "background": "#f6f7fb",
@@ -323,6 +421,7 @@ app.layout = html.Div(
                 html.Div(
                     style={"display":"flex","gap":"8px","flexWrap":"wrap","alignItems":"center"},
                     children=[
+                        *[
                         html.Button(
                             str(i),
                             id=f"ctl_top_{i}",
@@ -340,6 +439,8 @@ app.layout = html.Div(
                             },
                         )
                         for i in range(1, 11)
+                        ],
+                        html.Div(country_date_placeholders, id="territory_date_placeholders", style={"position":"fixed","top":"30px","right":"1100px","display":"flex","gap":"12px","alignItems":"center","zIndex":9999}),
                     ],
                 ),
 
@@ -353,7 +454,7 @@ app.layout = html.Div(
                                 "\u00A0",
                                 id=f"ctl_action_{i}",
                                 n_clicks=0,
-                                style={
+                                style={'marginTop': ('0px' if i==1 else '4px'),'marginBottom':'6px',
                                     "backgroundColor":"#111",
                                     "color":"#fff",
                                     "border":"1px solid #111",
@@ -367,21 +468,32 @@ app.layout = html.Div(
                             )
                             for i in range(1, 6)
                         ],
-                        dcc.Input(
-                            id="ctl_search",
-                            type="text",
-                            placeholder="Search...",
-                            style={"width":"354px","maxWidth":"220px","flex":"0 0 220px",
-                        
-                        
-                        
-"height":"34px",
-                                "padding":"0 12px",
-                                "border":"1px solid #ddd",
-                                "borderRadius":"10px",
-                                "minWidth":"354px",
-                                "fontFamily":"Arial",
-                            },
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        dcc.Input(
+                                            id="ctl_search",
+                                            type="text",
+                                            placeholder="Search...",
+                                            style={"width":"354px","maxWidth":"220px","flex":"0 0 220px",
+                                        
+                                        
+                                        
+                                        "height":"34px",
+                                                "padding":"0 12px",
+                                                "border":"1px solid #ddd",
+                                                "borderRadius":"10px",
+                                                "minWidth":"354px",
+                                                "fontFamily":"Arial",
+                                        
+                                            },
+                                        ),
+                                    ],
+                                    style={"display":"flex","gap":"18px","alignItems":"flex-end"},
+                                ),
+                            ],
+                            style={"display":"flex","gap":"18px","alignItems":"flex-end"},
                         ),
                     ],
                 ),
@@ -410,7 +522,7 @@ app.layout = html.Div(
                             style={"display": "flex", "alignItems": "center", "gap": "10px"},
                             children=[
                                 html.Div("", style={"fontSize": "34px"}),
-                                html.Div([html.Div(html.Img(src=app.get_asset_url(aion_flag_asset(country_code)), style={"height":"100%","width":"100%","objectFit":"cover","display":"block"}), style={"marginLeft":"-14px","height":"28px","width":"56px","borderRadius":"6px","marginRight":"10px","boxShadow":"0 2px 8px rgba(0,0,0,0.18)","overflow":"hidden","display":"inline-block"})], style={"color":"#2563eb","fontWeight":900,"display":"flex","alignItems":"center","gap":"6px","lineHeight":"28px"}),
+                                html.Div([html.Div(html.Img(src=app.get_asset_url(aion_flag_asset(country_code)), style={"height":"100%","width":"100%","objectFit":"cover","display":"block"}), style={"marginLeft":"-14px","height":"32px","width":"56px","borderRadius":"6px","marginRight":"10px","boxShadow":"0 2px 8px rgba(0,0,0,0.18)","overflow":"hidden","display":"inline-block"})], style={"color":"#2563eb","fontWeight":900,"display":"flex","alignItems":"center","gap":"6px","lineHeight":"28px"}),
                                 html.Div(aion_ellipsis(track_name, 18), style={"fontSize":"22px","fontWeight":950,"width":"18ch","flex":"0 0 18ch","whiteSpace":"nowrap","overflow":"hidden","textOverflow":"ellipsis","display":"block","minWidth":0}),
                                 weather_icon(),
                                 html.Div(
@@ -443,10 +555,10 @@ app.layout = html.Div(
                                 children=[aion_upcoming_tile(r) for r in aion_upcoming_pad((upcoming_races or []), 6)],
                             ),
                             html.Div(
-                                style={'display':'flex','flexDirection':'column','alignItems':'center','justifyContent':'center','gap':'2px','height':'72px','minWidth':'120px','position':'relative','overflow':'visible','transform':'translateX(60px)'},
+                                style={'display':'flex','flexDirection':'column','alignItems':'center','justifyContent':'center','gap':'4px','height':'72px','minWidth':'120px','position':'relative','overflow':'visible','transform':'translateX(60px)'},
                                 children=[
                                 html.Div(aion_status_label(globals().get('race_status', None)), style={'fontSize':'14px','fontWeight':900,'letterSpacing':'0.14em','color':'#2563eb','textAlign':'center'}),
-                                html.Div(AION_UI_VERSION, style={'fontSize':'12px','fontWeight':800,'letterSpacing':'0.06em','color':'#6b7280','textAlign':'center'}),
+                                html.Div(AION_UI_VERSION, style={'fontSize':'13px','fontWeight':800,'letterSpacing':'0.06em','color':'#6b7280','textAlign':'center'}),
         html.Img(src=app.get_asset_url('logos/aion_logo.png'), style={'position':'absolute','top':'82px','left':'50%','transform':'translateX(-50%)','height':'72px','width':'72px','opacity':0.98,'display':'block'}),
                                 ],
                             ),
@@ -464,7 +576,7 @@ app.layout = html.Div(
                 "background": "#ffffff",
                 "margin": "0 16px",
                 "borderRadius": "18px",
-                "padding": "12px 16px 16px 16px",
+                'padding':'0px',
                 "boxShadow": "0 6px 18px rgba(0,0,0,0.05)",
             },
             children=[
@@ -472,13 +584,13 @@ app.layout = html.Div(
                 column_header_row(),
 
                 # Runner rows (placeholders only)
-                *[
-                    html.Div(
+                *([
+                    html.Div((html.Div(
                         style={
                             "display": "grid",
                             "gridTemplateColumns": "56px 1.6fr 1fr 1fr 1fr 112px",
-                            "gap": "4px",
-                            "padding": "10px 0",
+                            "gap":'2px',
+                            'padding':'0px',
                         },
                         children=[
                             html.Div(
@@ -491,20 +603,61 @@ app.layout = html.Div(
                             ),
                             "", "", "", "", "",
                         ],
-                    )
-                    for i in range(1, 15)
-                ],
+                    )), style={'marginTop':('6px' if i==1 else '0px'),'marginBottom':'6px'})  # AION_RUNNER_GAP_WRAP_V2
+for i in range(1, 15)
+                ] + [html.Div('', id='runner-total-bar', style={'boxSizing':'border-box','marginRight':'12px','marginLeft':'12px','height':'64px','background':'#cbd5e1','border':'1px solid #e5e7eb','borderRadius':'12px','padding':'0 12px','display':'flex','alignItems':'center','fontWeight':'700','color':'#334155','width':'calc(100% - 24px)','position':'sticky','bottom':'0','zIndex':50,'justifyContent':'flex-start'})]),
             ],
         ),
 
-        # ================= FIXED BOTTOM BAR =================
+        
+                                # --- AION CODE/TRACK OVERLAY V1 ---
+                html.Div(
+                    id="code_track_overlay",
+                    style={"boxSizing":"border-box","borderRadius":"14px","padding":"0 12px 10px 12px",
+                        "position": "fixed",
+                        "top": "121px",
+                        "right": "1100px",
+                        "display": "flex",
+                        "gap": "18px",
+                        "zIndex": 9999,
+                        "pointerEvents": "auto",
+                        "backgroundColor": "#ffffff",
+                    },
+                    children=[
+                        html.Div(
+                            style={"display":"flex","flexDirection":"column","backgroundColor":"transparent"},
+                            children=[
+                                html.Div("CODE", style={"fontSize":"11px","fontWeight":"700","letterSpacing":"1px","marginBottom":"6px","backgroundColor":"transparent"}),
+                                dcc.Input(
+                                    id="code_placeholder",
+                                    value="",
+                                    placeholder="",
+                                    style={"width":"180px","minWidth":"180px","height":"34px","lineHeight":"34px","borderRadius":"10px","border":"1px solid #d9d9d9","padding":"0 12px","boxSizing":"border-box","backgroundColor":"#f5f5f5","fontWeight":"800","color":"#111"}
+                                ),
+                            ],
+                        ),
+                        html.Div(
+                            style={"display":"flex","flexDirection":"column","backgroundColor":"transparent"},
+                            children=[
+                                html.Div("TRACK", style={"fontSize":"11px","fontWeight":"700","letterSpacing":"1px","marginBottom":"6px","backgroundColor":"transparent"}),
+                                dcc.Input(
+                                    id="track_placeholder",
+                                    value="",
+                                    placeholder="",
+                                    style={"width":"180px","minWidth":"180px","height":"34px","lineHeight":"34px","borderRadius":"10px","border":"1px solid #d9d9d9","padding":"0 12px","boxSizing":"border-box","backgroundColor":"#f5f5f5","fontWeight":"800","color":"#111"}
+                                ),
+                            ],
+                        ),
+                    ],
+                ),
+# ================= FIXED BOTTOM BAR =================
         html.Div(
             style={
                 "position": "fixed",
                 "bottom": "0",
                 "left": "0",
                 "right": "0",
-                "height": "64px",
+                "height": "36px",
                 "background": "#ffffff",
                 "borderTop": "1px solid #e5e7eb",
                 "display": "flex",
@@ -513,7 +666,7 @@ app.layout = html.Div(
                 "padding": "0 24px",
             },
             children=[
-                html.Div("", style={"color": "#64748b"}),
+                html.Div("", style={"backgroundColor":"#f3f4f6","color": "#64748b"}),
             ],
         ),
     
@@ -525,7 +678,7 @@ app.layout = html.Div(
                 "left": "0px",
                 "right": "0px",
                 "bottom": "0px",
-                "height": "60px",
+                "height": "36px",
                 "background": "#2b2b2b",
                 "borderTop": "1px solid rgba(255,255,255,0.10)",
                 "display": "flex",
@@ -545,7 +698,7 @@ app.layout = html.Div(
                         "color":"#fff",
                         "border":"1px solid #9ca3af",
                         "borderRadius":"0px",
-                        "height":"44px",
+                        "height":"36px",
                         "minWidth":"108px",
                         "cursor":"pointer",
                     },
@@ -553,7 +706,7 @@ app.layout = html.Div(
         
                 # Center 9 placeholders
                 html.Div(
-                    style={"flex":"1","display":"flex","justifyContent":"center","alignItems":"center","gap":"4px"},
+                    style={"backgroundColor":"#f3f4f6","flex":"1","display":"flex","justifyContent":"center","alignItems":"center","gap":"6px"},
                     children=[
                         html.Button(
                             "\u00A0",
@@ -564,7 +717,7 @@ app.layout = html.Div(
                                 "color":"#fff",
                                 "border":"1px solid #9ca3af",
                                 "borderRadius":"0px",
-                                "height":"44px",
+                                "height":"36px",
                                 "minWidth":"108px",
                                 "cursor":"pointer",
                             },
@@ -583,7 +736,7 @@ app.layout = html.Div(
                         "color":"#fff",
                         "border":"1px solid #9ca3af",
                         "borderRadius":"0px",
-                        "height":"44px",
+                        "height":"36px",
                         "minWidth":"108px",
                         "cursor":"pointer",
                     },
